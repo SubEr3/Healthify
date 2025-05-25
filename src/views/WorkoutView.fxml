@@ -13,7 +13,7 @@
         <Insets top="20" right="20" bottom="20" left="20" />
     </padding>
 
-    <Label text="Log a Workout" style="-fx-font-size: 18;" />
+    <Label text="Workout" style="-fx-font-size: 18;" />
 
     <TextField fx:id="exerciseField" promptText="Exercise Name" />
     <TextField fx:id="setsField" promptText="Sets" />
@@ -30,6 +30,13 @@
 
 
     <Label fx:id="statusLabel" />
+
+    <HBox spacing="10" alignment="CENTER">
+        <DatePicker fx:id="startDatePicker" promptText="Start Date" />
+        <DatePicker fx:id="endDatePicker" promptText="End Date" />
+        <Button text="Filter" onAction="#handleFilterWorkouts" />
+        <Button text="Clear" onAction="#handleClearFilter" />
+    </HBox>
 
     <TableView fx:id="workoutTable" prefHeight="200" prefWidth="500">
         <columns>

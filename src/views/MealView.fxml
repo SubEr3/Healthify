@@ -16,7 +16,7 @@
     <Insets top="20" right="20" bottom="20" left="20" />
   </padding>
 
-  <Label text="Log a Meal" style="-fx-font-size:18;" />
+  <Label text="Meal" style="-fx-font-size:18;" />
   <DatePicker fx:id="mealDate" />
   <ComboBox fx:id="mealType" promptText="Meal Type">
     <items>

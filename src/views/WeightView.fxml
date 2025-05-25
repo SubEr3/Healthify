@@ -15,7 +15,7 @@
         <Insets top="20" right="20" bottom="20" left="20" />
     </padding>
 
-    <Label text="Log Weight" style="-fx-font-size:18;" />
+    <Label text="Weight" style="-fx-font-size:18;" />
     <DatePicker fx:id="weightDate" />
     <TextField fx:id="weightField" promptText="Weight (kg)" />
 
