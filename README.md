@@ -129,7 +129,6 @@ Feel free to explore the filtering, editing, and goal‐setting features in each
 ## Future Improvements
 
 * Export/import to CSV/JSON
-* Text search by exercise or food
 * Notifications/reminders for logging
 * UI theming & mobile adaptation
 
