@@ -3,6 +3,7 @@ package src.database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.Statement;
 
 public class DBManager {
@@ -47,12 +48,20 @@ public class DBManager {
                 );
                 """;
 
+        String createSettings = """
+                CREATE TABLE IF NOT EXISTS settings (
+                  key   TEXT PRIMARY KEY,
+                  value TEXT
+                );
+                """;
+
         try (Connection conn = connect();
                 Statement stmt = conn.createStatement()) {
 
             stmt.execute(createWorkouts);
             stmt.execute(createMeals);
             stmt.execute(createWeights);
+            stmt.execute(createSettings);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -166,4 +175,36 @@ public class DBManager {
             e.printStackTrace();
         }
     }
+
+    public static void setSetting(String key, String value) {
+        String sql = """
+                  INSERT INTO settings(key,value)
+                  VALUES(?,?)
+                  ON CONFLICT(key) DO UPDATE SET value=excluded.value
+                """;
+        try (Connection c = connect();
+                PreparedStatement p = c.prepareStatement(sql)) {
+            p.setString(1, key);
+            p.setString(2, value);
+            p.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String getSetting(String key) {
+        String sql = "SELECT value FROM settings WHERE key=?";
+        try (Connection c = connect();
+                PreparedStatement p = c.prepareStatement(sql)) {
+            p.setString(1, key);
+            try (ResultSet rs = p.executeQuery()) {
+                if (rs.next())
+                    return rs.getString("value");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

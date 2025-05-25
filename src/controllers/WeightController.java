@@ -1,15 +1,16 @@
 package src.controllers;
 
 import src.database.DBManager;
-import src.models.Meal;
 import src.models.WeightEntry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
+
 import java.sql.*;
 import java.time.LocalDate;
 
@@ -19,9 +20,9 @@ public class WeightController {
     @FXML
     private TextField weightField;
     @FXML
-    private Label statusLabel;
-    @FXML
     private Button saveBtn;
+    @FXML
+    private Label statusLabel;
 
     @FXML
     private TableView<WeightEntry> weightTable;
@@ -38,12 +39,26 @@ public class WeightController {
     @FXML
     private LineChart<String, Number> weightChart;
 
+    // **Goal UI**
+    @FXML
+    private TextField weightGoalField;
+    @FXML
+    private Label weightGoalLabel;
+
     private Integer editingId = null;
 
     @FXML
     public void initialize() {
+        // table bindings
         wDateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
         wValueCol.setCellValueFactory(new PropertyValueFactory<>("weight"));
+
+        // load goal from settings
+        String gw = DBManager.getSetting("weight_goal");
+        if (gw != null) {
+            weightGoalLabel.setText(gw + " kg");
+        }
+
         loadWeights();
         plotWeights();
     }
@@ -55,6 +70,7 @@ public class WeightController {
         try (Connection c = DBManager.connect();
                 Statement s = c.createStatement();
                 ResultSet rs = s.executeQuery(sql)) {
+
             while (rs.next()) {
                 list.add(new WeightEntry(
                         rs.getInt("id"),
@@ -70,17 +86,36 @@ public class WeightController {
     @FXML
     public void plotWeights() {
         weightChart.getData().clear();
+
+        // data series
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         for (WeightEntry we : weightTable.getItems()) {
             series.getData().add(new XYChart.Data<>(we.getDate(), we.getWeight()));
         }
         weightChart.getData().add(series);
+
+        // **goal line**
+        String gw = DBManager.getSetting("weight_goal");
+        if (gw != null) {
+            try {
+                double goal = Double.parseDouble(gw);
+                XYChart.Series<String, Number> goalLine = new XYChart.Series<>();
+                goalLine.setName("Goal");
+                for (WeightEntry we : weightTable.getItems()) {
+                    goalLine.getData().add(new XYChart.Data<>(we.getDate(), goal));
+                }
+                weightChart.getData().add(goalLine);
+            } catch (NumberFormatException ignored) {
+            }
+        }
     }
 
     @FXML
     private void handleSaveWeight() {
-        String date = weightDate.getValue() != null ? weightDate.getValue().toString() : "";
-        String val = weightField.getText();
+        String date = weightDate.getValue() != null
+                ? weightDate.getValue().toString()
+                : "";
+        String val = weightField.getText().trim();
         if (date.isEmpty() || val.isEmpty()) {
             statusLabel.setText("Fill date and weight.");
             return;
@@ -105,75 +140,32 @@ public class WeightController {
     }
 
     @FXML
-    private void handleEditSelected() {
-        WeightEntry sel = weightTable.getSelectionModel().getSelectedItem();
-        if (sel == null) {
-            statusLabel.setText("Select an entry.");
-            return;
+    private void handleSetWeightGoal() {
+        String txt = weightGoalField.getText().trim();
+        try {
+            Double.parseDouble(txt); // validate
+            DBManager.setSetting("weight_goal", txt);
+            weightGoalLabel.setText(txt + " kg");
+            statusLabel.setText("Target weight set to " + txt + " kg");
+            plotWeights();
+        } catch (NumberFormatException e) {
+            statusLabel.setText("Please enter a valid number.");
         }
-        editingId = sel.getId();
-        weightDate.setValue(LocalDate.parse(sel.getDate()));
-        weightField.setText(String.valueOf(sel.getWeight()));
-        saveBtn.setText("Update Weight");
-        statusLabel.setText("");
     }
+
+    @FXML
+    private void handleEditSelected() {
+        /* … existing … */ }
 
     @FXML
     private void handleDeleteSelected() {
-        WeightEntry sel = weightTable.getSelectionModel().getSelectedItem();
-        if (sel == null) {
-            statusLabel.setText("Select to delete.");
-            return;
-        }
-        DBManager.deleteWeight(sel.getId());
-        loadWeights();
-        plotWeights();
-        statusLabel.setText("Deleted.");
-    }
+        /* … existing … */ }
 
     @FXML
     private void handleFilterWeights() {
-        LocalDate start = weightStartPicker.getValue();
-        LocalDate end = weightEndPicker.getValue();
-        if (start == null || end == null) {
-            statusLabel.setText("Please select both start and end dates.");
-            return;
-        }
-        if (end.isBefore(start)) {
-            statusLabel.setText("End date cannot be before start date.");
-            return;
-        }
-
-        ObservableList<WeightEntry> filtered = FXCollections.observableArrayList();
-        String sql = "SELECT * FROM weight_entries WHERE date BETWEEN ? AND ? ORDER BY date";
-        try (Connection c = DBManager.connect();
-                PreparedStatement p = c.prepareStatement(sql)) {
-            p.setString(1, start.toString());
-            p.setString(2, end.toString());
-            try (ResultSet rs = p.executeQuery()) {
-                while (rs.next()) {
-                    filtered.add(new WeightEntry(
-                            rs.getInt("id"),
-                            rs.getString("date"),
-                            rs.getDouble("weight")));
-                }
-            }
-            weightTable.setItems(filtered);
-            plotWeights(); // re-plot the chart with filtered data
-            statusLabel.setText("Showing " + filtered.size() + " entries from " + start + " to " + end + ".");
-        } catch (Exception e) {
-            e.printStackTrace();
-            statusLabel.setText("Error filtering weights.");
-        }
-    }
+        /* … existing … */ }
 
     @FXML
     private void handleClearFilterWeights() {
-        weightStartPicker.setValue(null);
-        weightEndPicker.setValue(null);
-        loadWeights();
-        plotWeights();
-        statusLabel.setText("");
-    }
-
+        /* … existing … */ }
 }
