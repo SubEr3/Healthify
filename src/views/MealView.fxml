@@ -9,6 +9,10 @@
 <?import java.lang.String?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Button?>
+
 
 <VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
   fx:controller="src.controllers.MealController" spacing="10" alignment="CENTER">
@@ -38,6 +42,14 @@
     <Button text="Refresh" onAction="#loadMeals" />
   </HBox>
   <Label fx:id="statusLabel" />
+
+  <HBox spacing="10" alignment="CENTER">
+    <DatePicker fx:id="mealStartPicker" promptText="Start Date" />
+    <DatePicker fx:id="mealEndPicker" promptText="End Date" />
+    <Button text="Filter" onAction="#handleFilterMeals" />
+    <Button text="Clear" onAction="#handleClearFilterMeals" />
+  </HBox>
+
 
   <TableView fx:id="mealTable" prefHeight="200" prefWidth="600">
     <columns>

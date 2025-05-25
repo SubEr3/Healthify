@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.LocalDate;
@@ -45,6 +46,11 @@ public class MealController {
     private TableColumn<DailyCalories, String> summaryDateCol;
     @FXML
     private TableColumn<DailyCalories, Integer> summaryCalCol;
+
+    @FXML
+    private DatePicker mealStartPicker;
+    @FXML
+    private DatePicker mealEndPicker;
 
     private Integer editingId = null;
 
@@ -169,4 +175,51 @@ public class MealController {
         loadDailySummary();
         statusLabel.setText("Meal deleted.");
     }
+
+    @FXML
+    private void handleFilterMeals() {
+        LocalDate start = mealStartPicker.getValue();
+        LocalDate end = mealEndPicker.getValue();
+        if (start == null || end == null) {
+            statusLabel.setText("Please select both start and end dates.");
+            return;
+        }
+        if (end.isBefore(start)) {
+            statusLabel.setText("End date cannot be before start date.");
+            return;
+        }
+
+        ObservableList<Meal> filtered = FXCollections.observableArrayList();
+        String sql = "SELECT * FROM meals WHERE date BETWEEN ? AND ? ORDER BY date DESC";
+        try (Connection c = DBManager.connect();
+                PreparedStatement p = c.prepareStatement(sql)) {
+            p.setString(1, start.toString());
+            p.setString(2, end.toString());
+            try (ResultSet rs = p.executeQuery()) {
+                while (rs.next()) {
+                    filtered.add(new Meal(
+                            rs.getInt("id"),
+                            rs.getString("date"),
+                            rs.getString("type"),
+                            rs.getString("food"),
+                            rs.getInt("calories")));
+                }
+            }
+            mealTable.setItems(filtered);
+            statusLabel.setText("Showing " + filtered.size() + " meals from " + start + " to " + end + ".");
+        } catch (Exception e) {
+            e.printStackTrace();
+            statusLabel.setText("Error filtering meals.");
+        }
+    }
+
+    @FXML
+    private void handleClearFilterMeals() {
+        mealStartPicker.setValue(null);
+        mealEndPicker.setValue(null);
+        loadMeals();
+        loadDailySummary(); // refresh summary too
+        statusLabel.setText("");
+    }
+
 }
