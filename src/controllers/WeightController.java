@@ -7,12 +7,9 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.HBox;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
-
 import java.sql.*;
-import java.time.LocalDate;
 
 public class WeightController {
     @FXML
