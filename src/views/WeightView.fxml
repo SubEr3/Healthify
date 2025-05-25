@@ -26,6 +26,14 @@
         <Button text="Refresh" onAction="#loadWeights" />
     </HBox>
 
+    <HBox spacing="10" alignment="CENTER">
+        <DatePicker fx:id="weightStartPicker" promptText="Start Date" />
+        <DatePicker fx:id="weightEndPicker" promptText="End Date" />
+        <Button text="Filter" onAction="#handleFilterWeights" />
+        <Button text="Clear" onAction="#handleClearFilterWeights" />
+    </HBox>
+
+
     <TableView fx:id="weightTable" prefHeight="200" prefWidth="400">
         <columns>
             <TableColumn fx:id="wDateCol" text="Date" />

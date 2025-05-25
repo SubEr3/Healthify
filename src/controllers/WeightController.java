@@ -1,6 +1,7 @@
 package src.controllers;
 
 import src.database.DBManager;
+import src.models.Meal;
 import src.models.WeightEntry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -28,6 +29,11 @@ public class WeightController {
     private TableColumn<WeightEntry, String> wDateCol;
     @FXML
     private TableColumn<WeightEntry, Double> wValueCol;
+
+    @FXML
+    private DatePicker weightStartPicker;
+    @FXML
+    private DatePicker weightEndPicker;
 
     @FXML
     private LineChart<String, Number> weightChart;
@@ -124,4 +130,50 @@ public class WeightController {
         plotWeights();
         statusLabel.setText("Deleted.");
     }
+
+    @FXML
+    private void handleFilterWeights() {
+        LocalDate start = weightStartPicker.getValue();
+        LocalDate end = weightEndPicker.getValue();
+        if (start == null || end == null) {
+            statusLabel.setText("Please select both start and end dates.");
+            return;
+        }
+        if (end.isBefore(start)) {
+            statusLabel.setText("End date cannot be before start date.");
+            return;
+        }
+
+        ObservableList<WeightEntry> filtered = FXCollections.observableArrayList();
+        String sql = "SELECT * FROM weight_entries WHERE date BETWEEN ? AND ? ORDER BY date";
+        try (Connection c = DBManager.connect();
+                PreparedStatement p = c.prepareStatement(sql)) {
+            p.setString(1, start.toString());
+            p.setString(2, end.toString());
+            try (ResultSet rs = p.executeQuery()) {
+                while (rs.next()) {
+                    filtered.add(new WeightEntry(
+                            rs.getInt("id"),
+                            rs.getString("date"),
+                            rs.getDouble("weight")));
+                }
+            }
+            weightTable.setItems(filtered);
+            plotWeights(); // re-plot the chart with filtered data
+            statusLabel.setText("Showing " + filtered.size() + " entries from " + start + " to " + end + ".");
+        } catch (Exception e) {
+            e.printStackTrace();
+            statusLabel.setText("Error filtering weights.");
+        }
+    }
+
+    @FXML
+    private void handleClearFilterWeights() {
+        weightStartPicker.setValue(null);
+        weightEndPicker.setValue(null);
+        loadWeights();
+        plotWeights();
+        statusLabel.setText("");
+    }
+
 }
