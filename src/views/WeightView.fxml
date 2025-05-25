@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.CategoryAxis?>
+
+<VBox xmlns="http://javafx.com/javafx/8.0.171"
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="src.controllers.WeightController"
+    spacing="10" alignment="CENTER">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20" />
+    </padding>
+
+    <Label text="Log Weight" style="-fx-font-size:18;" />
+    <DatePicker fx:id="weightDate" />
+    <TextField fx:id="weightField" promptText="Weight (kg)" />
+
+    <HBox spacing="10" alignment="CENTER">
+        <Button fx:id="saveBtn" text="Save Weight" onAction="#handleSaveWeight" />
+        <Button text="Edit Selected" onAction="#handleEditSelected" />
+        <Button text="Delete Selected" onAction="#handleDeleteSelected" />
+        <Button text="Refresh" onAction="#loadWeights" />
+    </HBox>
+
+    <TableView fx:id="weightTable" prefHeight="200" prefWidth="400">
+        <columns>
+            <TableColumn fx:id="wDateCol" text="Date" />
+            <TableColumn fx:id="wValueCol" text="Weight" />
+        </columns>
+    </TableView>
+
+    <Label text="Weight Progress" style="-fx-font-size:16;" />
+    <LineChart fx:id="weightChart">
+        <xAxis>
+            <CategoryAxis label="Date" />
+        </xAxis>
+        <yAxis>
+            <NumberAxis label="Weight (kg)" />
+        </yAxis>
+    </LineChart>
+</VBox>

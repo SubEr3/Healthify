@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.Label?>
+<?import javafx.geometry.Insets?> 
+<?import javafx.scene.layout.VBox?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.*?>
+
+<VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
+  fx:controller="src.controllers.MealController" spacing="10" alignment="CENTER">
+  <padding>
+    <Insets top="20" right="20" bottom="20" left="20" />
+  </padding>
+
+  <Label text="Log a Meal" style="-fx-font-size:18;" />
+  <DatePicker fx:id="mealDate" />
+  <ComboBox fx:id="mealType" promptText="Meal Type">
+    <items>
+      <FXCollections fx:factory="observableArrayList">
+        <String fx:value="Breakfast" />
+        <String fx:value="Lunch" />
+        <String fx:value="Dinner" />
+        <String fx:value="Snack" />
+      </FXCollections>
+    </items>
+  </ComboBox>
+  <TextField fx:id="foodField" promptText="Food Item" />
+  <TextField fx:id="calField" promptText="Calories" />
+
+  <HBox spacing="10" alignment="CENTER">
+    <Button fx:id="saveBtn" text="Save Meal" onAction="#handleSaveMeal" />
+    <Button text="Edit Selected" onAction="#handleEditSelected" />
+    <Button text="Delete Selected" onAction="#handleDeleteSelected" />
+    <Button text="Refresh" onAction="#loadMeals" />
+  </HBox>
+  <Label fx:id="statusLabel" />
+
+  <TableView fx:id="mealTable" prefHeight="200" prefWidth="600">
+    <columns>
+      <TableColumn fx:id="dateCol" text="Date" />
+      <TableColumn fx:id="typeCol" text="Type" />
+      <TableColumn fx:id="foodCol" text="Food" />
+      <TableColumn fx:id="calCol" text="Calories" />
+    </columns>
+  </TableView>
+  <Label text="Daily Calories Summary" style="-fx-font-size: 16;" />
+  <TableView fx:id="summaryTable" prefHeight="150" prefWidth="400">
+    <columns>
+      <TableColumn fx:id="summaryDateCol" text="Date" />
+      <TableColumn fx:id="summaryCalCol" text="Total Calories" />
+    </columns>
+  </TableView>
+</VBox>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/8.0.171"
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="src.controllers.WorkoutController"
+    spacing="10" alignment="CENTER">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20" />
+    </padding>
+
+    <Label text="Log a Workout" style="-fx-font-size: 18;" />
+
+    <TextField fx:id="exerciseField" promptText="Exercise Name" />
+    <TextField fx:id="setsField" promptText="Sets" />
+    <TextField fx:id="repsField" promptText="Reps" />
+    <DatePicker fx:id="datePicker" promptText="Date" />
+
+    <!-- action buttons grouped together -->
+    <HBox spacing="10" alignment="CENTER">
+        <Button fx:id="saveButton" text="Save Workout" onAction="#handleSaveWorkout" />
+        <Button text="Edit Selected" onAction="#handleEditSelected" />
+        <Button text="Delete Selected" onAction="#handleDeleteSelected" />
+        <Button text="Refresh" onAction="#loadWorkouts" />
+    </HBox>
+
+
+    <Label fx:id="statusLabel" />
+
+    <TableView fx:id="workoutTable" prefHeight="200" prefWidth="500">
+        <columns>
+            <TableColumn fx:id="dateColumn" text="Date" />
+            <TableColumn fx:id="exerciseColumn" text="Exercise" />
+            <TableColumn fx:id="setsColumn" text="Sets" />
+            <TableColumn fx:id="repsColumn" text="Reps" />
+        </columns>
+    </TableView>
+</VBox>
