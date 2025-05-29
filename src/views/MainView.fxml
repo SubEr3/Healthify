@@ -10,6 +10,11 @@
     fx:controller="src.controllers.MainController">
 
     <tabs>
+        <Tab text="Dashboard">
+            <content>
+                <fx:include source="DashboardView.fxml" />
+            </content>
+        </Tab>
         <Tab text="Workouts">
             <content>
                 <fx:include source="WorkoutView.fxml" />

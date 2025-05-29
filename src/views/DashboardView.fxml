@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/8.0.171"
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="src.controllers.DashboardController"
+    spacing="20" alignment="TOP_CENTER">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20" />
+    </padding>
+
+    <Label text="📊 Dashboard"
+        style="-fx-font-size:20; -fx-font-weight:bold;" />
+
+    <HBox spacing="40" alignment="CENTER">
+        <VBox spacing="5"
+            style="-fx-border-color:lightgray; -fx-border-width:1; -fx-padding:10;">
+            <Label text="Workouts" />
+            <Label fx:id="wk7Label" />
+            <Label fx:id="wk30Label" />
+        </VBox>
+        <VBox spacing="5"
+            style="-fx-border-color:lightgray; -fx-border-width:1; -fx-padding:10;">
+            <Label text="Weight Change (30 days)" />
+            <Label fx:id="wtChangeLabel" />
+        </VBox>
+    </HBox>
+
+    <!-- mini chart + placeholder -->
+    <VBox spacing="5" alignment="CENTER">
+        <Label text="Weight (Last 7 Days)" />
+        <StackPane prefWidth="300" prefHeight="180">
+            <LineChart fx:id="miniWeightChart"
+                animated="false"
+                legendVisible="false"
+                prefWidth="300" prefHeight="180">
+                <xAxis>
+                    <CategoryAxis label="Date" />
+                </xAxis>
+                <yAxis>
+                    <NumberAxis label="kg" />
+                </yAxis>
+            </LineChart>
+            <Label fx:id="miniWeightPlaceholder"
+                text="No data for last 7 days"
+                visible="false"
+                style="-fx-text-fill:gray; -fx-font-style:italic;" />
+        </StackPane>
+    </VBox>
+</VBox>
