@@ -10,6 +10,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import java.sql.*;
+import java.time.LocalDate;
 
 public class WeightController {
     @FXML
@@ -152,11 +153,30 @@ public class WeightController {
 
     @FXML
     private void handleEditSelected() {
-        /* … existing … */ }
+        WeightEntry sel = weightTable.getSelectionModel().getSelectedItem();
+        if (sel == null) {
+            statusLabel.setText("Please select an entry to edit.");
+            return;
+        }
+        editingId = sel.getId();
+        weightDate.setValue(LocalDate.parse(sel.getDate()));
+        weightField.setText(String.valueOf(sel.getWeight()));
+        saveBtn.setText("Update Weight");
+        statusLabel.setText("");
+    }
 
     @FXML
     private void handleDeleteSelected() {
-        /* … existing … */ }
+        WeightEntry sel = weightTable.getSelectionModel().getSelectedItem();
+        if (sel == null) {
+            statusLabel.setText("Please select an entry to delete.");
+            return;
+        }
+        DBManager.deleteWeight(sel.getId());
+        loadWeights();
+        plotWeights();
+        statusLabel.setText("Entry deleted.");
+    }
 
     @FXML
     private void handleFilterWeights() {
