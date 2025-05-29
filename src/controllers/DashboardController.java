@@ -103,7 +103,7 @@ public class DashboardController {
         } else {
             miniWeightPlaceholder.setVisible(false);
             miniWeightChart.setVisible(true);
-            miniWeightChart.setData(FXCollections.observableArrayList(series));
+            miniWeightChart.setData(FXCollections.observableArrayList(java.util.Collections.singletonList(series)));
         }
     }
 }
