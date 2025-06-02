@@ -19,6 +19,7 @@
     <Label text="📊 Dashboard"
         style="-fx-font-size:20; -fx-font-weight:bold;" />
 
+    <!-- === Existing workout/weight‐change summaries === -->
     <HBox spacing="40" alignment="CENTER">
         <VBox spacing="5"
             style="-fx-border-color:lightgray; -fx-border-width:1; -fx-padding:10;">
@@ -33,7 +34,23 @@
         </VBox>
     </HBox>
 
-    <!-- mini chart + placeholder -->
+    <!-- === NEW: Goals & Activity Section === -->
+    <HBox spacing="40" alignment="CENTER">
+        <VBox spacing="5"
+            style="-fx-border-color:lightgray; -fx-border-width:1; -fx-padding:10;">
+            <Label text="Goals" style="-fx-font-weight:bold;" />
+            <Label fx:id="weightGoalDashboardLabel" text="Weight Goal: -" />
+            <Label fx:id="workoutGoalDashboardLabel" text="Workout Goal: -" />
+        </VBox>
+        <VBox spacing="5"
+            style="-fx-border-color:lightgray; -fx-border-width:1; -fx-padding:10;">
+            <Label text="Activity" style="-fx-font-weight:bold;" />
+            <Label fx:id="activityWeekLabel" text="This Week: - workouts" />
+            <Label fx:id="activityMonthLabel" text="This Month: - workouts" />
+        </VBox>
+    </HBox>
+
+    <!-- === mini weight chart + placeholder === -->
     <VBox spacing="5" alignment="CENTER">
         <Label text="Weight (Last 7 Days)" />
         <StackPane prefWidth="300" prefHeight="180">
@@ -54,4 +71,5 @@
                 style="-fx-text-fill:gray; -fx-font-style:italic;" />
         </StackPane>
     </VBox>
+
 </VBox>
