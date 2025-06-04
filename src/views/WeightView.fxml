@@ -22,6 +22,8 @@
     <DatePicker fx:id="weightDate" />
     <TextField fx:id="weightField" promptText="Weight (kg)" />
 
+    <Label fx:id="statusLabel" text="" />
+
     <HBox spacing="10" alignment="CENTER">
         <Button fx:id="saveBtn" text="Save Weight" onAction="#handleSaveWeight" />
         <Button text="Edit Selected" onAction="#handleEditSelected" />
