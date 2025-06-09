@@ -59,7 +59,7 @@
 
     <!-- === mini weight chart + placeholder === -->
     <VBox spacing="5" alignment="CENTER">
-        <Label text="Weight (Last 7 Days)" />
+        <Label text="Weight (Last 30 Days)" />
         <StackPane prefWidth="300" prefHeight="180">
             <LineChart fx:id="miniWeightChart"
                 animated="false"
@@ -73,7 +73,7 @@
                 </yAxis>
             </LineChart>
             <Label fx:id="miniWeightPlaceholder"
-                text="No data for last 7 days"
+                text="No data for last 30 days"
                 visible="false"
                 style="-fx-text-fill:gray; -fx-font-style:italic;" />
         </StackPane>
