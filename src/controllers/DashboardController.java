@@ -29,6 +29,10 @@ public class DashboardController {
     private Label activityWeekLabel;
     @FXML
     private Label activityMonthLabel;
+    @FXML
+    private Label dailyStreakLabel;
+    @FXML
+    private Label weeklyStreakLabel;
 
     @FXML
     public void initialize() {
@@ -54,6 +58,8 @@ public class DashboardController {
         } else {
             weightGoalDashboardLabel.setText("Weight Goal: -");
         }
+        dailyStreakLabel.setText("Daily Streak: " + computeDailyStreak() + " days");
+        weeklyStreakLabel.setText("Weekly Streak: " + computeWeeklyStreak() + " weeks");
 
         // ACTIVITY SECTION
         int workoutsThisWeek = queryCount(
@@ -176,4 +182,77 @@ public class DashboardController {
             yAxis.setTickUnit(totalRange / 5.0);
         }
     }
+
+    private int computeDailyStreak() {
+        // Returns count of consecutive days up to today with at least one workout each
+        // day
+        try (Connection c = DBManager.connect();
+                PreparedStatement p = c.prepareStatement(
+                        "SELECT DISTINCT date FROM workouts WHERE date <= ? ORDER BY date DESC")) {
+            p.setString(1, LocalDate.now().toString());
+            try (ResultSet rs = p.executeQuery()) {
+                int streak = 0;
+                LocalDate expected = LocalDate.now();
+                while (rs.next()) {
+                    LocalDate workoutDate = LocalDate.parse(rs.getString("date"));
+                    if (workoutDate.equals(expected)) {
+                        streak++;
+                        expected = expected.minusDays(1);
+                    } else if (workoutDate.isBefore(expected)) {
+                        // Streak broken
+                        break;
+                    }
+                    // (If workoutDate is after expected, keep checking, but this shouldn't happen)
+                }
+                return streak;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    private int computeWeeklyStreak() {
+        // Returns count of consecutive weeks (ending this week) with at least one
+        // workout per week
+        try (Connection c = DBManager.connect();
+                PreparedStatement p = c.prepareStatement(
+                        "SELECT DISTINCT strftime('%Y-%W', date) as year_week FROM workouts WHERE date <= ? ORDER BY year_week DESC")) {
+            p.setString(1, LocalDate.now().toString());
+            try (ResultSet rs = p.executeQuery()) {
+                int streak = 0;
+                LocalDate now = LocalDate.now();
+                int currentYear = now.getYear();
+                int currentWeek = now.get(java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+                while (rs.next()) {
+                    String[] yw = rs.getString("year_week").split("-");
+                    int y = Integer.parseInt(yw[0]);
+                    int w = Integer.parseInt(yw[1]);
+                    if (y == currentYear && w == currentWeek) {
+                        streak++;
+                    } else if (y == currentYear && w == currentWeek - 1) {
+                        streak++;
+                        currentWeek--;
+                    } else if (w == 52 && y == currentYear - 1 && currentWeek == 1) {
+                        // Year rollover
+                        streak++;
+                        currentYear--;
+                        currentWeek = 52;
+                    } else {
+                        break;
+                    }
+                    currentWeek--;
+                    if (currentWeek < 1) {
+                        currentWeek = 52;
+                        currentYear--;
+                    }
+                }
+                return streak;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
 }

@@ -34,7 +34,7 @@
         </VBox>
     </HBox>
 
-    <!-- === NEW: Goals & Activity Section === -->
+    <!-- === Goals & Activity Section === -->
     <HBox spacing="40" alignment="CENTER">
         <VBox spacing="5"
             style="-fx-border-color:lightgray; -fx-border-width:1; -fx-padding:10;">
@@ -48,6 +48,14 @@
             <Label fx:id="activityMonthLabel" text="This Month: - workouts" />
         </VBox>
     </HBox>
+
+    <!-- === Streaks Section === -->
+    <VBox spacing="5"
+        style="-fx-border-color:lightgray; -fx-border-width:1; -fx-padding:10;">
+        <Label text="Streaks" style="-fx-font-weight:bold;" />
+        <Label fx:id="dailyStreakLabel" text="Daily Streak: -" />
+        <Label fx:id="weeklyStreakLabel" text="Weekly Streak: -" />
+    </VBox>
 
     <!-- === mini weight chart + placeholder === -->
     <VBox spacing="5" alignment="CENTER">
