@@ -53,7 +53,7 @@ public class CalendarController {
         Map<LocalDate, List<String>> entriesByDay = loadEntriesForMonth();
 
         LocalDate firstOfMonth = currentMonth.atDay(1);
-        int dayOfWeekIndex = firstOfMonth.getDayOfWeek().getValue() % 7; // Monday=0, Sunday=6
+        int dayOfWeekIndex = firstOfMonth.getDayOfWeek().getValue() - 1; // Monday=0, Sunday=6
         int row = 1;
         int col = dayOfWeekIndex;
 
@@ -65,9 +65,14 @@ public class CalendarController {
             dayBtn.setPrefSize(36, 36);
 
             if (entriesByDay.containsKey(date)) {
-                dayBtn.setStyle("-fx-background-color: #9be7a4;"); // green highlight for days with entries
+                dayBtn.setStyle("-fx-background-color: #9be7a4;");
             } else {
                 dayBtn.setStyle("-fx-background-color: #eeeeee;");
+            }
+
+            // Optional: Highlight today
+            if (date.equals(LocalDate.now())) {
+                dayBtn.setStyle(dayBtn.getStyle() + "; -fx-border-color: #1976d2; -fx-border-width: 2;");
             }
 
             dayBtn.setOnAction(e -> {
