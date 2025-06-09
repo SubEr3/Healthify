@@ -12,6 +12,7 @@ public class Main extends Application {
         DBManager.initializeDatabase();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/src/views/MainView.fxml"));
         Scene scene = new Scene(loader.load());
+        scene.getStylesheets().add(getClass().getResource("/src/views/styles.css").toExternalForm());
         primaryStage.setTitle("Healthify - Health Management System");
         primaryStage.setScene(scene);
         primaryStage.show();
