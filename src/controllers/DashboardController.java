@@ -74,8 +74,8 @@ public class DashboardController {
         activityWeekLabel.setText("This Week: " + workoutsThisWeek + " workouts");
         activityMonthLabel.setText("This Month: " + workoutsThisMonth + " workouts");
 
-        // Mini chart (last 7 days)
-        loadMiniWeightChart(ago7);
+        // Mini chart (last 30 days)
+        loadMiniWeightChart(ago30);
     }
 
     private int queryCount(String sql, LocalDate from, LocalDate to) {
@@ -167,19 +167,34 @@ public class DashboardController {
             // Add series to chart
             miniWeightChart.setData(FXCollections.singletonObservableList(series));
 
-            // “Zoom in” the Y-axis around [minWeight, maxWeight]
+            // --- Y-Axis: always clean .0 bounds! ---
             NumberAxis yAxis = (NumberAxis) miniWeightChart.getYAxis();
             yAxis.setAutoRanging(false);
 
             double range = maxWeight - minWeight;
             double padding = (range > 1.0) ? range * 0.05 : 0.5;
 
-            yAxis.setLowerBound(minWeight - padding);
-            yAxis.setUpperBound(maxWeight + padding);
+            // Calculate lower and upper, rounded to .0
+            double rawLower = minWeight - padding;
+            double rawUpper = maxWeight + padding;
 
-            // Choose a reasonable tick unit (here: split padded range into 5)
-            double totalRange = (maxWeight + padding) - (minWeight - padding);
-            yAxis.setTickUnit(totalRange / 5.0);
+            double niceLower = Math.floor(rawLower);
+            double niceUpper = Math.ceil(rawUpper);
+
+            yAxis.setLowerBound(niceLower);
+            yAxis.setUpperBound(niceUpper);
+
+            // Choose a “nice” tick unit (0.5, 1.0, 2.0, etc.)
+            double totalRange = niceUpper - niceLower;
+            double[] candidates = { 0.5, 1.0, 2.0, 5.0, 10.0 };
+            double bestTick = 1.0;
+            for (double candidate : candidates) {
+                if (totalRange / candidate <= 10) {
+                    bestTick = candidate;
+                    break;
+                }
+            }
+            yAxis.setTickUnit(bestTick);
         }
     }
 
