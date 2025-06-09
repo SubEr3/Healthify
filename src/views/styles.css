@@ -5,6 +5,7 @@
 .nav-btn {
     -fx-background-color: transparent;
     -fx-font-size: 16px;
+    -fx-font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", "Segoe UI", sans-serif;
     -fx-text-fill: #555;
     -fx-pref-width: 120;
     -fx-font-weight: bold;
@@ -12,6 +13,7 @@
     -fx-border-width: 0 0 2 0;
     -fx-border-color: transparent;
 }
+
 
 .nav-btn:focused,
 .nav-btn:hover {

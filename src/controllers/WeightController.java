@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import java.sql.*;
 import java.time.LocalDate;
@@ -87,8 +88,16 @@ public class WeightController {
 
         // data series
         XYChart.Series<String, Number> series = new XYChart.Series<>();
+        double minWeight = Double.MAX_VALUE;
+        double maxWeight = Double.MIN_VALUE;
+
         for (WeightEntry we : weightTable.getItems()) {
-            series.getData().add(new XYChart.Data<>(we.getDate(), we.getWeight()));
+            double w = we.getWeight();
+            series.getData().add(new XYChart.Data<>(we.getDate(), w));
+            if (w < minWeight)
+                minWeight = w;
+            if (w > maxWeight)
+                maxWeight = w;
         }
         weightChart.getData().add(series);
 
@@ -105,6 +114,38 @@ public class WeightController {
                 weightChart.getData().add(goalLine);
             } catch (NumberFormatException ignored) {
             }
+        }
+
+        // --- Zoomed-in, clean Y-axis ---
+        if (!series.getData().isEmpty()) {
+            // Get the Y axis
+            NumberAxis yAxis = (NumberAxis) weightChart.getYAxis();
+            yAxis.setAutoRanging(false);
+
+            double range = maxWeight - minWeight;
+            double padding = (range > 1.0) ? range * 0.05 : 0.5;
+
+            // Clean lower/upper bound (ends with .0)
+            double niceLower = Math.floor(minWeight - padding);
+            double niceUpper = Math.ceil(maxWeight + padding);
+
+            yAxis.setLowerBound(niceLower);
+            yAxis.setUpperBound(niceUpper);
+
+            // Choose a “nice” tick unit (0.5, 1.0, 2.0, etc.)
+            double totalRange = niceUpper - niceLower;
+            double[] candidates = { 0.5, 1.0, 2.0, 5.0, 10.0 };
+            double bestTick = 1.0;
+            for (double candidate : candidates) {
+                if (totalRange / candidate <= 10) {
+                    bestTick = candidate;
+                    break;
+                }
+            }
+            yAxis.setTickUnit(bestTick);
+        } else {
+            // fallback
+            ((NumberAxis) weightChart.getYAxis()).setAutoRanging(true);
         }
     }
 
