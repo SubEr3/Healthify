@@ -30,6 +30,11 @@
                 <fx:include source="WeightView.fxml" />
             </content>
         </Tab>
+        <Tab text="Calendar">
+            <content>
+                <fx:include source="CalendarView.fxml" />
+            </content>
+        </Tab>
     </tabs>
 
 </TabPane>
