@@ -40,7 +40,6 @@
             style="-fx-border-color:lightgray; -fx-border-width:1; -fx-padding:10;">
             <Label text="Goals" style="-fx-font-weight:bold;" />
             <Label fx:id="weightGoalDashboardLabel" text="Weight Goal: -" />
-            <Label fx:id="workoutGoalDashboardLabel" text="Workout Goal: -" />
         </VBox>
         <VBox spacing="5"
             style="-fx-border-color:lightgray; -fx-border-width:1; -fx-padding:10;">

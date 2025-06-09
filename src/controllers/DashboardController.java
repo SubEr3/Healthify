@@ -19,30 +19,56 @@ public class DashboardController {
     private Label wk30Label;
     @FXML
     private Label wtChangeLabel;
-
     @FXML
     private LineChart<String, Number> miniWeightChart;
     @FXML
     private Label miniWeightPlaceholder;
+    @FXML
+    private Label weightGoalDashboardLabel;
+    @FXML
+    private Label activityWeekLabel;
+    @FXML
+    private Label activityMonthLabel;
 
     @FXML
     public void initialize() {
         LocalDate now = LocalDate.now();
-        LocalDate ago7 = now.minusDays(7);
-        LocalDate ago30 = now.minusDays(30);
+        LocalDate ago7 = now.minusDays(6);
+        LocalDate ago30 = now.minusDays(29);
 
-        // workouts summary
+        // Workouts summary
         String countSql = "SELECT COUNT(*) AS cnt FROM workouts WHERE date BETWEEN ? AND ?";
         wk7Label.setText("Last 7 days:  " + queryCount(countSql, ago7, now) + " workouts");
         wk30Label.setText("Last 30 days: " + queryCount(countSql, ago30, now) + " workouts");
 
-        // weight change
-        double startW = fetchWeightOnOrBefore(ago30);
+        // Weight change (use first-ever weight)
+        double startW = fetchEarliestWeight();
         double endW = fetchWeightOnOrBefore(now);
         wtChangeLabel.setText(
                 String.format("%.1f → %.1f   (Δ %.1f kg)", startW, endW, endW - startW));
 
-        // mini-chart (last 7 days)
+        // GOALS SECTION (weight only)
+        String weightGoal = DBManager.getSetting("weight_goal");
+        if (weightGoal != null && !weightGoal.isEmpty()) {
+            weightGoalDashboardLabel.setText("Weight Goal: " + weightGoal + " kg");
+        } else {
+            weightGoalDashboardLabel.setText("Weight Goal: -");
+        }
+
+        // ACTIVITY SECTION
+        int workoutsThisWeek = queryCount(
+                "SELECT COUNT(*) AS cnt FROM workouts WHERE date BETWEEN ? AND ?",
+                ago7, now);
+
+        LocalDate firstDayOfMonth = now.withDayOfMonth(1);
+        int workoutsThisMonth = queryCount(
+                "SELECT COUNT(*) AS cnt FROM workouts WHERE date BETWEEN ? AND ?",
+                firstDayOfMonth, now);
+
+        activityWeekLabel.setText("This Week: " + workoutsThisWeek + " workouts");
+        activityMonthLabel.setText("This Month: " + workoutsThisMonth + " workouts");
+
+        // Mini chart (last 7 days)
         loadMiniWeightChart(ago7);
     }
 
@@ -59,6 +85,20 @@ public class DashboardController {
             e.printStackTrace();
             return 0;
         }
+    }
+
+    private double fetchEarliestWeight() {
+        String wsql = "SELECT weight FROM weight_entries ORDER BY date ASC LIMIT 1";
+        try (Connection c = DBManager.connect();
+                PreparedStatement p = c.prepareStatement(wsql);
+                ResultSet rs = p.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble("weight");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     private double fetchWeightOnOrBefore(LocalDate date) {
