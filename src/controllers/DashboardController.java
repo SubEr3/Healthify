@@ -33,6 +33,8 @@ public class DashboardController {
     private Label dailyStreakLabel;
     @FXML
     private Label weeklyStreakLabel;
+    @FXML
+    private Label weightGoalDateDashboardLabel;
 
     @FXML
     public void initialize() {
@@ -58,10 +60,19 @@ public class DashboardController {
         } else {
             weightGoalDashboardLabel.setText("Weight Goal: -");
         }
+
+        // **Show the goal date if set**
+        String weightGoalDate = DBManager.getSetting("weight_goal_date");
+        if (weightGoalDate != null && !weightGoalDate.isEmpty()) {
+            weightGoalDateDashboardLabel.setText("by " + weightGoalDate);
+        } else {
+            weightGoalDateDashboardLabel.setText("");
+        }
+
+        // Streaks and activity sections (existing code...)
         dailyStreakLabel.setText("Daily Streak: " + computeDailyStreak() + " days");
         weeklyStreakLabel.setText("Weekly Streak: " + computeWeeklyStreak() + " weeks");
 
-        // ACTIVITY SECTION
         int workoutsThisWeek = queryCount(
                 "SELECT COUNT(*) AS cnt FROM workouts WHERE date BETWEEN ? AND ?",
                 ago7, now);

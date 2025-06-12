@@ -38,11 +38,15 @@ public class WeightController {
     @FXML
     private LineChart<String, Number> weightChart;
 
-    // **Goal UI**
+    // Goal UI
     @FXML
     private TextField weightGoalField;
     @FXML
     private Label weightGoalLabel;
+    @FXML
+    private DatePicker weightGoalDatePicker;
+    @FXML
+    private Label weightGoalDateLabel;
 
     private Integer editingId = null;
 
@@ -52,14 +56,31 @@ public class WeightController {
         wDateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
         wValueCol.setCellValueFactory(new PropertyValueFactory<>("weight"));
 
-        // load goal from settings
-        String gw = DBManager.getSetting("weight_goal");
-        if (gw != null) {
-            weightGoalLabel.setText(gw + " kg");
-        }
-
         loadWeights();
         plotWeights();
+
+        // Load goal weight from settings
+        String goalWeight = DBManager.getSetting("weight_goal");
+        if (goalWeight != null) {
+            weightGoalLabel.setText(goalWeight + " kg");
+            weightGoalField.setText(goalWeight);
+        } else {
+            weightGoalLabel.setText("not set");
+        }
+
+        // Load goal date from settings
+        String goalDate = DBManager.getSetting("weight_goal_date");
+        if (goalDate != null) {
+            weightGoalDateLabel.setText("by " + goalDate);
+            try {
+                weightGoalDatePicker.setValue(LocalDate.parse(goalDate));
+            } catch (Exception e) {
+                weightGoalDatePicker.setValue(null);
+            }
+        } else {
+            weightGoalDateLabel.setText("");
+            weightGoalDatePicker.setValue(null);
+        }
     }
 
     @FXML
@@ -101,7 +122,7 @@ public class WeightController {
         }
         weightChart.getData().add(series);
 
-        // **goal line**
+        // goal line
         String gw = DBManager.getSetting("weight_goal");
         if (gw != null) {
             try {
@@ -116,23 +137,20 @@ public class WeightController {
             }
         }
 
-        // --- Zoomed-in, clean Y-axis ---
+        // Zoomed-in, clean Y-axis
         if (!series.getData().isEmpty()) {
-            // Get the Y axis
             NumberAxis yAxis = (NumberAxis) weightChart.getYAxis();
             yAxis.setAutoRanging(false);
 
             double range = maxWeight - minWeight;
             double padding = (range > 1.0) ? range * 0.05 : 0.5;
 
-            // Clean lower/upper bound (ends with .0)
             double niceLower = Math.floor(minWeight - padding);
             double niceUpper = Math.ceil(maxWeight + padding);
 
             yAxis.setLowerBound(niceLower);
             yAxis.setUpperBound(niceUpper);
 
-            // Choose a “nice” tick unit (0.5, 1.0, 2.0, etc.)
             double totalRange = niceUpper - niceLower;
             double[] candidates = { 0.5, 1.0, 2.0, 5.0, 10.0 };
             double bestTick = 1.0;
@@ -144,7 +162,6 @@ public class WeightController {
             }
             yAxis.setTickUnit(bestTick);
         } else {
-            // fallback
             ((NumberAxis) weightChart.getYAxis()).setAutoRanging(true);
         }
     }
@@ -181,14 +198,40 @@ public class WeightController {
     @FXML
     private void handleSetWeightGoal() {
         String txt = weightGoalField.getText().trim();
-        try {
-            Double.parseDouble(txt); // validate
-            DBManager.setSetting("weight_goal", txt);
-            weightGoalLabel.setText(txt + " kg");
-            statusLabel.setText("Target weight set to " + txt + " kg");
-            plotWeights();
-        } catch (NumberFormatException e) {
-            statusLabel.setText("Please enter a valid number.");
+        LocalDate date = weightGoalDatePicker.getValue();
+
+        boolean goalSet = false;
+        boolean dateSet = false;
+
+        if (txt != null && !txt.isEmpty()) {
+            try {
+                Double.parseDouble(txt); // validate
+                DBManager.setSetting("weight_goal", txt);
+                weightGoalLabel.setText(txt + " kg");
+                statusLabel.setText("Target weight set to " + txt + " kg");
+                plotWeights();
+                goalSet = true;
+            } catch (NumberFormatException e) {
+                statusLabel.setText("Please enter a valid number.");
+            }
+        }
+
+        if (date != null) {
+            DBManager.setSetting("weight_goal_date", date.toString());
+            weightGoalDateLabel.setText("by " + date.toString());
+            if (goalSet) {
+                statusLabel.setText("Target weight and date set!");
+            } else {
+                statusLabel.setText("Target date set!");
+            }
+            dateSet = true;
+        } else {
+            // Optionally clear the date label if user removes the date
+            weightGoalDateLabel.setText("");
+        }
+
+        if (!goalSet && !dateSet) {
+            statusLabel.setText("Please enter a valid goal and/or pick a date.");
         }
     }
 
@@ -221,9 +264,30 @@ public class WeightController {
 
     @FXML
     private void handleFilterWeights() {
-        /* … existing … */ }
+        LocalDate start = weightStartPicker.getValue();
+        LocalDate end = weightEndPicker.getValue();
+
+        ObservableList<WeightEntry> filtered = FXCollections.observableArrayList();
+
+        for (WeightEntry entry : weightTable.getItems()) {
+            LocalDate entryDate = LocalDate.parse(entry.getDate());
+            boolean afterStart = (start == null) || !entryDate.isBefore(start);
+            boolean beforeEnd = (end == null) || !entryDate.isAfter(end);
+            if (afterStart && beforeEnd) {
+                filtered.add(entry);
+            }
+        }
+        weightTable.setItems(filtered);
+        plotWeights();
+        statusLabel.setText("Filtered by date.");
+    }
 
     @FXML
     private void handleClearFilterWeights() {
-        /* … existing … */ }
+        weightStartPicker.setValue(null);
+        weightEndPicker.setValue(null);
+        loadWeights();
+        plotWeights();
+        statusLabel.setText("Filter cleared.");
+    }
 }

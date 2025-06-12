@@ -58,8 +58,11 @@
     <Label text="Target Weight (kg):" />
     <HBox spacing="10" alignment="CENTER">
         <TextField fx:id="weightGoalField" promptText="e.g. 70.0" />
+        <DatePicker fx:id="weightGoalDatePicker" promptText="Target Date" />
         <Button text="Set Goal" onAction="#handleSetWeightGoal" />
         <Label fx:id="weightGoalLabel" text="not set" />
+        <Label fx:id="weightGoalDateLabel" text="" />
     </HBox>
+
 
 </VBox>
